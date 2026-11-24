@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f7f5">
+  <title>AirWindow | Plan an outdoor time window</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="model.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="AirWindow home"><span class="brand-mark">A</span><span>AirWindow</span></a>
+    <span class="topbar-note">SCHOOL & COMMUNITY PLANNING</span>
+    <span class="live-state"><span class="live-dot"></span><span id="data-state">Connecting to forecast</span></span>
+  </header>
+
+  <main id="top">
+    <section class="intro">
+      <div>
+        <p class="eyebrow">OUTDOOR ACTIVITY PLANNER</p>
+        <h1>Find a clearer window.</h1>
+        <p class="lede">Compare possible start times for one outdoor activity using the same forecast day and duration.</p>
+      </div>
+      <div class="model-badge"><span class="badge-label">MODEL</span><strong>CAMS · hourly</strong><span>Regional forecast, not a local sensor</span></div>
+    </section>
+
+    <section class="workspace" aria-label="Air quality planning workspace">
+      <aside class="controls" aria-label="Scenario settings">
+        <div class="section-head"><span class="step">01</span><h2>Set the scenario</h2></div>
+
+        <label class="field-label" for="place-search">Place</label>
+        <div class="search-row">
+          <input id="place-search" type="search" value="Chengdu" autocomplete="off" placeholder="Search a city">
+          <button id="search-place" class="icon-button" type="button" aria-label="Search city" title="Search city">↵</button>
+        </div>
+        <div id="place-results" class="place-results" role="listbox" aria-label="Matching places" hidden></div>
+        <p class="subfield" id="place-detail">Chengdu, China · 30.57°, 104.07°</p>
+
+        <div class="field-grid">
+          <div>
+            <label class="field-label" for="day-select">Forecast day</label>
+            <select id="day-select" disabled><option>Loading…</option></select>
+          </div>
+          <div>
+            <label class="field-label" for="duration">Activity length</label>
+            <div class="input-with-unit"><input id="duration" type="number" min="15" max="180" step="15" value="30"><span>min</span></div>
+          </div>
+        </div>
+
+        <div class="field-grid time-fields">
+          <div>
+            <label class="field-label" for="window-start">Earliest start</label>
+            <input id="window-start" type="time" value="08:00">
+          </div>
+          <div>
+            <label class="field-label" for="window-end">Latest finish</label>
+            <input id="window-end" type="time" value="17:00">
+          </div>
+        </div>
+
+        <div class="reference-field">
+          <label class="field-label" for="reference-start">Compare against</label>
+          <div class="input-with-unit"><input id="reference-start" type="time" value="12:00"><span>start</span></div>
+        </div>
+        <button id="compare" class="primary-button" type="button" disabled>Compare time windows <span aria-hidden="true">→</span></button>
+        <p id="status" class="status-line" role="status">Loading hourly forecast…</p>
+
+        <div class="privacy-note"><span class="privacy-icon" aria-hidden="true">◎</span><span>Runs in your browser. No account, precise address, or health profile needed.</span></div>
+      </aside>
+
+      <section class="results" aria-live="polite">
+        <div class="section-head result-head"><span class="step">02</span><h2>Compare the day</h2><span id="day-label" class="day-label">—</span></div>
+        <div class="chart-wrap">
+          <div class="chart-title"><div><span class="chart-kicker">PM2.5 FORECAST</span><strong>Hourly concentration</strong></div><span class="unit">µg/m³</span></div>
+          <canvas id="chart" aria-label="Hourly PM2.5 forecast chart"></canvas>
+          <div class="chart-axis"><span id="axis-start">00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div>
+          <div class="chart-legend"><span class="legend-swatch"></span>Forecast PM2.5 <span class="legend-line"></span>Chosen reference block</div>
+        </div>
+
+        <div class="comparison" id="comparison">
+          <article class="window-card best-card">
+            <div class="card-top"><span class="card-label">LOWEST IN YOUR WINDOW</span><span class="rank-mark">01</span></div>
+            <div class="window-main"><strong id="best-time">—</strong><span id="best-date">Select a day</span></div>
+            <div class="metric-row"><span>Mean PM2.5 during activity</span><strong><span id="best-pm">—</span> <small>µg/m³</small></strong></div>
+            <div class="metric-row"><span>Highest hourly US AQI</span><strong id="best-aqi">—</strong></div>
+            <p class="card-caption">Lowest modeled PM2.5 among the tested start times, not a safety guarantee.</p>
+          </article>
+          <article class="window-card reference-card">
+            <div class="card-top"><span class="card-label">YOUR REFERENCE</span><span class="reference-mark">↔</span></div>
+            <div class="window-main"><strong id="reference-time">—</strong><span id="reference-date">—</span></div>
+            <div class="metric-row"><span>Mean PM2.5 during activity</span><strong><span id="reference-pm">—</span> <small>µg/m³</small></strong></div>
+            <div class="metric-row"><span>Highest hourly US AQI</span><strong id="reference-aqi">—</strong></div>
+            <p class="card-caption" id="difference">Choose a valid comparison window.</p>
+          </article>
+        </div>
+        <div class="method-strip"><strong>How to read this</strong><span>The exposure proxy is mean forecast PM2.5 × activity minutes. It compares schedules only; it is not inhaled dose, personal risk, or a medical recommendation.</span></div>
+      </section>
+    </section>
+
+    <section class="source-row">
+      <div><span class="source-label">DATA & LIMITS</span><p>Air quality is modeled by CAMS at regional grid scale. Local conditions can differ; check official local advisories before deciding.</p></div>
+      <a href="https://open-meteo.com/en/docs/air-quality-api" target="_blank" rel="noreferrer">Open-Meteo API ↗</a>
+    </section>
+    <footer><span>AirWindow · a planning prototype for UniHacks</span><span>Forecasts inform a comparison; people make the decision.</span></footer>
+  </main>
+</body>
+</html>
